@@ -13,6 +13,9 @@
  *   MQTT_TOPIC       — default: iot/tanaman/data
  */
 
+import * as dotenv from "dotenv";
+dotenv.config();
+
 import mqtt, { type MqttClient, type IClientOptions } from "mqtt";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 

@@ -11,20 +11,26 @@ import type {
 import {
   initialContainers,
   initialAlerts,
-  generateChartHistory,
   initialLogs,
   initialDetections,
-  generateSensorData,
 } from "./mockData";
 
 // Re-export the sensor type used throughout the app
 // We use SensorData from mockData as the base shape, MqttSensorData extends it
 export type { MqttSensorData as LiveSensorData };
 
-// Union type: either initial mock data shape OR live MQTT shape
-// Both satisfy the same keys that components consume
-export type SensorSnapshot = ReturnType<typeof generateSensorData> & {
-  pumpActive?: boolean;
+// Shape for sensor state — mirrors MqttSensorData from websocket.ts
+export type SensorSnapshot = {
+  soilMoisture: number;
+  temperature: number;
+  humidity: number;
+  aiConfidence: number;
+  disease: string;
+  waterFlow: number;
+  tankCapacity: number;
+  phLevel: number;
+  pumpActive: boolean;
+  timestamp: number;
 };
 
 interface AgriStore {
@@ -57,11 +63,25 @@ interface AgriStore {
   resolveAlert: (id: string) => void;
 }
 
+// ── Zero-value initial sensor state — real data flows in from Supabase ────────
+const initialSensorData: SensorSnapshot = {
+  soilMoisture: 0,
+  temperature: 0,
+  humidity: 0,
+  aiConfidence: 0,
+  disease: "—",
+  waterFlow: 0,
+  tankCapacity: 0,
+  phLevel: 0,
+  pumpActive: false,
+  timestamp: 0,
+};
+
 export const useAgriStore = create<AgriStore>((set, _get) => ({
-  sensorData: generateSensorData(),
+  sensorData: initialSensorData,
   containers: initialContainers,
   alerts: initialAlerts,
-  chartHistory: generateChartHistory(),
+  chartHistory: [],          // starts empty — populated by Supabase realtime
   logs: initialLogs,
   detections: initialDetections,
   mqttStatus: "disconnected",
