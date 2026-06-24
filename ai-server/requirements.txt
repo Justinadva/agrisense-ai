@@ -1,0 +1,11 @@
+# AgriSense AI Server — Dependencies
+# Install: pip install -r requirements.txt
+
+fastapi==0.111.0
+uvicorn[standard]==0.30.1
+ultralytics==8.2.48
+opencv-python==4.10.0.84
+Pillow==10.4.0
+numpy==1.26.4
+python-multipart==0.0.9
+pydantic==2.7.4

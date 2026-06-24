@@ -76,7 +76,7 @@ export default function ContainerMonitoringTable() {
       </div>
 
       {/* Rows */}
-      <div className="divide-y" style={{ divideColor: "#d9e5dc" }}>
+      <div className="divide-y" style={{ borderColor: "#d9e5dc" }}>
         {containers.map((c, i) => {
           const s = statusStyles[c.status];
           const ringColor = c.healthScore >= 80 ? "#22c55e" : c.healthScore >= 60 ? "#f4c542" : "#ef4444";

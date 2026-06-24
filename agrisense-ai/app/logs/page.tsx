@@ -173,7 +173,7 @@ export default function LogsPage() {
         </div>
 
         {/* Log Rows */}
-        <div className="divide-y overflow-y-auto" style={{ divideColor: "#eef3ef", maxHeight: 520 }}>
+        <div className="divide-y overflow-y-auto" style={{ maxHeight: 520 }}>
           <AnimatePresence initial={false}>
             {filtered.map((log, i) => {
               const { icon: Icon, color, bg } = statusConfig[log.status];

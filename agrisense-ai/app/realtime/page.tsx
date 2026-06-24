@@ -164,7 +164,7 @@ export default function RealtimePage() {
                 </div>
                 <div className="flex items-center gap-1 flex-shrink-0">
                   <Clock className="w-3 h-3" style={{ color: "#9bb8a4" }} />
-                  <span className="text-[10px]" style={{ color: "#9bb8a4" }}>
+                  <span className="text-[10px]" style={{ color: "#9bb8a4" }} suppressHydrationWarning>
                     {Math.floor((Date.now() - a.timestamp.getTime()) / 60000)}m ago
                   </span>
                 </div>

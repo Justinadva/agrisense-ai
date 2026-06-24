@@ -226,7 +226,7 @@ export default function Navbar() {
                         <X className="w-4 h-4" />
                       </button>
                     </div>
-                    <div className="divide-y" style={{ divideColor: isDark ? "rgba(47,158,68,0.1)" : "#d9e5dc" }}>
+                    <div className="divide-y" style={{ borderColor: isDark ? "rgba(47,158,68,0.1)" : "#d9e5dc" }}>
                       {mockNotifications.map((n) => (
                         <div
                           key={n.id}

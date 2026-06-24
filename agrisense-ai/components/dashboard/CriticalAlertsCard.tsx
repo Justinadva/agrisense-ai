@@ -69,7 +69,7 @@ export default function CriticalAlertsCard() {
                   <p className="text-xs mt-0.5 leading-tight" style={{ color: "#6b7c72" }}>
                     {alert.description}
                   </p>
-                  <p className="text-[10px] mt-1" style={{ color: "#9bb8a4" }}>
+                  <p className="text-[10px] mt-1" style={{ color: "#9bb8a4" }} suppressHydrationWarning>
                     {formatDistanceToNow(alert.timestamp, { addSuffix: true })}
                   </p>
                 </div>
