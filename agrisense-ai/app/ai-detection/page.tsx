@@ -166,6 +166,7 @@ export default function AIDetectionPage() {
       try {
         const r = await fetch(`${AI_API_URL}/health`, {
           signal: AbortSignal.timeout(4000),
+          headers: { "ngrok-skip-browser-warning": "true" },
         });
         setServerOk(r.ok);
       } catch {
@@ -187,6 +188,7 @@ export default function AIDetectionPage() {
       const res = await fetch(`${AI_API_URL}/detect`, {
         method: "GET",
         signal: AbortSignal.timeout(30000), // 30s timeout — Raspberry Pi can be slow
+        headers: { "ngrok-skip-browser-warning": "true" },
       });
 
       if (!res.ok) throw new Error(`Server error: ${res.status} ${res.statusText}`);
