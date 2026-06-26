@@ -442,7 +442,7 @@ export default function AIDetectionPage() {
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       ref={imgRef}
-                      src={`data:image/jpeg;base64,${result.image_base64}`}
+                      src={result.image_base64}
                       alt="Hasil jepretan kamera kebun"
                       className="w-full h-auto block"
                       onLoad={handleImgLoad}
