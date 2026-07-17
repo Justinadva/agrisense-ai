@@ -2,7 +2,6 @@
 
 import { useAgriStore } from "@/lib/store";
 import { motion } from "framer-motion";
-import { scheduledTasks } from "@/lib/mockData";
 import {
   AreaChart,
   Area,
@@ -11,13 +10,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { Clock, CheckCircle2, Play, Calendar } from "lucide-react";
-
-const statusConfig = {
-  Scheduled: { color: "#6b7c72", bg: "rgba(107,124,114,0.1)", icon: Calendar },
-  Running: { color: "#2f9e44", bg: "rgba(47,158,68,0.12)", icon: Play },
-  Completed: { color: "#22c55e", bg: "rgba(34,197,94,0.1)", icon: CheckCircle2 },
-};
+import { Clock, CheckCircle2, AlertTriangle, Info } from "lucide-react";
 
 const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const todayIdx = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
@@ -36,9 +29,24 @@ const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?:
   return null;
 };
 
+const statusIcon = (status: string) => {
+  if (status === "warning") return <AlertTriangle className="w-3.5 h-3.5" style={{ color: "#f97316" }} />;
+  if (status === "success") return <CheckCircle2 className="w-3.5 h-3.5" style={{ color: "#22c55e" }} />;
+  return <Info className="w-3.5 h-3.5" style={{ color: "#38bdf8" }} />;
+};
+
+const statusBg = (status: string) => {
+  if (status === "warning") return { bg: "rgba(249,115,22,0.1)", color: "#ea580c" };
+  if (status === "success") return { bg: "rgba(34,197,94,0.1)", color: "#16a34a" };
+  return { bg: "rgba(56,189,248,0.1)", color: "#0284c7" };
+};
+
 export default function ActivityOverviewCard() {
-  const { chartHistory } = useAgriStore();
+  const { chartHistory, logs } = useAgriStore();
   const recentPoints = chartHistory.slice(-12);
+
+  // Show latest 3 live log entries instead of static mock scheduledTasks
+  const recentLogs = logs.slice(0, 3);
 
   return (
     <div className="rounded-[28px] p-5 flex flex-col gap-4"
@@ -110,39 +118,45 @@ export default function ActivityOverviewCard() {
       {/* Divider */}
       <div className="h-px" style={{ background: "#d9e5dc" }} />
 
-      {/* Scheduled Tasks */}
+      {/* Live Log Entries — replaces static scheduledTasks mock */}
       <div className="space-y-2">
-        {scheduledTasks.slice(0, 3).map((task) => {
-          const { color, bg, icon: Icon } = statusConfig[task.status];
-          return (
-            <motion.div
-              key={task.id}
-              whileHover={{ x: 2 }}
-              className="flex items-center justify-between py-2 px-3 rounded-[16px]"
-              style={{ background: "rgba(238,243,239,0.6)" }}
-            >
-              <div className="flex items-center gap-2.5 min-w-0">
-                <div className="w-7 h-7 rounded-[10px] flex items-center justify-center flex-shrink-0"
-                  style={{ background: bg }}>
-                  <Icon className="w-3.5 h-3.5" style={{ color }} />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-xs font-semibold truncate" style={{ color: "#1e2b22" }}>
-                    {task.title}
-                  </p>
-                  <div className="flex items-center gap-1 mt-0.5">
-                    <Clock className="w-2.5 h-2.5" style={{ color: "#6b7c72" }} />
-                    <span className="text-[10px]" style={{ color: "#6b7c72" }}>{task.time}</span>
+        {recentLogs.length === 0 ? (
+          <p className="text-xs text-center py-2" style={{ color: "#9bb8a4" }}>
+            Menunggu data sensor…
+          </p>
+        ) : (
+          recentLogs.map((log) => {
+            const { bg, color } = statusBg(log.status);
+            return (
+              <motion.div
+                key={log.id}
+                whileHover={{ x: 2 }}
+                className="flex items-center justify-between py-2 px-3 rounded-[16px]"
+                style={{ background: "rgba(238,243,239,0.6)" }}
+              >
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="w-7 h-7 rounded-[10px] flex items-center justify-center flex-shrink-0"
+                    style={{ background: bg }}>
+                    {statusIcon(log.status)}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-xs font-semibold truncate" style={{ color: "#1e2b22" }}>
+                      {log.event}
+                    </p>
+                    <div className="flex items-center gap-1 mt-0.5">
+                      <Clock className="w-2.5 h-2.5" style={{ color: "#6b7c72" }} />
+                      <span className="text-[10px]" style={{ color: "#6b7c72" }}>{log.time}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <span className="flex-shrink-0 text-[10px] font-semibold px-2 py-1 rounded-lg"
-                style={{ color, background: bg }}>
-                {task.status}
-              </span>
-            </motion.div>
-          );
-        })}
+                <span className="flex-shrink-0 text-[10px] font-semibold px-2 py-1 rounded-lg"
+                  style={{ color, background: bg }}>
+                  {log.sensor}
+                </span>
+              </motion.div>
+            );
+          })
+        )}
       </div>
     </div>
   );

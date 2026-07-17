@@ -31,7 +31,10 @@ const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?:
 export default function GrowthAnalyticsCard() {
   const { chartHistory } = useAgriStore();
   const recent = chartHistory.slice(-18);
-  const avgHealth = Math.round(recent.reduce((a, b) => a + b.healthScore, 0) / recent.length);
+  const hasData = recent.length > 0;
+  const avgHealth = hasData
+    ? Math.round(recent.reduce((a, b) => a + b.healthScore, 0) / recent.length)
+    : 0;
   const trend = recent.length > 1
     ? (recent[recent.length - 1].healthScore - recent[0].healthScore).toFixed(1)
     : "0";

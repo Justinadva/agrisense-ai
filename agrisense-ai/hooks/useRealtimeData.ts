@@ -103,7 +103,7 @@ function rowToAlert(row: SensorLogRow): AlertData | null {
  *      and skips processing if the row id was already handled
  */
 export function useRealtimeData(): void {
-  const { updateSensorData, addChartPoint, addLog, addAlert, setMqttStatus } =
+  const { updateSensorData, addChartPoint, addLog, addAlert, setMqttStatus, updateContainerFromSensor } =
     useAgriStore();
 
   /** Tracks the highest row id already dispatched to the store. */
@@ -122,6 +122,7 @@ export function useRealtimeData(): void {
       addLog(rowToLogEntry(row));
       const alert = rowToAlert(row);
       if (alert) addAlert(alert);
+      updateContainerFromSensor(rowToSensorData(row));
       setMqttStatus("connected");
     };
 
@@ -150,8 +151,10 @@ export function useRealtimeData(): void {
 
         // Set live sensor state from the most recent row
         const latest = rows[rows.length - 1];
-        updateSensorData(rowToSensorData(latest));
+        const latestSensorData = rowToSensorData(latest);
+        updateSensorData(latestSensorData);
         addLog(rowToLogEntry(latest));
+        updateContainerFromSensor(latestSensorData);
         const alert = rowToAlert(latest);
         if (alert) addAlert(alert);
 
@@ -192,5 +195,5 @@ export function useRealtimeData(): void {
     return () => {
       clearInterval(pollInterval);
     };
-  }, [updateSensorData, addChartPoint, addLog, addAlert, setMqttStatus]);
+    }, [updateSensorData, addChartPoint, addLog, addAlert, setMqttStatus, updateContainerFromSensor]);
 }

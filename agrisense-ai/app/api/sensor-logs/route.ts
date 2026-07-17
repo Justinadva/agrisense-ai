@@ -8,6 +8,11 @@
 //   GET  /api/sensor-logs?schema=1  → returns column names of sensor_logs (debug)
 //   POST /api/sensor-logs           → inserts a new row from ESP8266 payload
 
+// Disable Next.js caching — every request must hit Neon directly
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
+
 import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 

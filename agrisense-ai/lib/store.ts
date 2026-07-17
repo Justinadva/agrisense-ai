@@ -51,6 +51,7 @@ interface AgriStore {
   // ── Actions ──────────────────────────────────────────────────────────────────
   updateSensorData: (data: MqttSensorData) => void;
   updateContainers: (containers: ContainerData[]) => void;
+  updateContainerFromSensor: (data: MqttSensorData) => void;
   addAlert: (alert: AlertData) => void;
   addChartPoint: (point: ChartPoint) => void;
   addLog: (log: LogEntry) => void;
@@ -63,7 +64,7 @@ interface AgriStore {
   resolveAlert: (id: string) => void;
 }
 
-// ── Zero-value initial sensor state — real data flows in from Supabase ────────
+// ── Zero-value initial sensor state — real data flows in from Neon ─────────────
 const initialSensorData: SensorSnapshot = {
   soilMoisture: 0,
   temperature: 0,
@@ -98,6 +99,20 @@ export const useAgriStore = create<AgriStore>((set, _get) => ({
     }),
 
   updateContainers: (containers) => set({ containers }),
+
+  // Derive per-container data from the latest single sensor reading
+  updateContainerFromSensor: (data: MqttSensorData) =>
+    set((state) => ({
+      containers: state.containers.map((c) => ({
+        ...c,
+        moisture:    data.soilMoisture,
+        temperature: data.temperature,
+        aiHealth:    data.soilMoisture > 50 ? "Optimal Moisture" : data.soilMoisture > 30 ? "Low Moisture" : "Critical — Irrigate",
+        status:      (data.soilMoisture > 50 ? "Optimal" : data.soilMoisture > 30 ? "Warning" : "Critical") as ContainerData["status"],
+        healthScore: data.soilMoisture > 50 ? 90 : data.soilMoisture > 30 ? 65 : 40,
+        lastScan:    new Date().toLocaleTimeString("en-US", { hour12: false }),
+      })),
+    })),
 
   addAlert: (alert) =>
     set((state) => ({
