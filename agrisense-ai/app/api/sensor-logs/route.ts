@@ -38,6 +38,23 @@ interface Esp8266PostBody {
   pump_status?: boolean;
 }
 
+/**
+ * PostgreSQL NUMERIC columns are returned as strings by the @neondatabase/serverless driver.
+ * This helper coerces them back to JavaScript numbers so frontend math works correctly.
+ */
+function parseRow(row: Record<string, unknown>): SensorLogRow {
+  return {
+    ...row,
+    id:           Number(row.id),
+    temperature:  parseFloat(row.temperature  as string),
+    humidity:     parseFloat(row.humidity     as string),
+    soil_moisture: parseFloat(row.soil_moisture as string),
+    soil_raw_adc: row.soil_raw_adc != null ? parseFloat(row.soil_raw_adc as string) : undefined,
+    pump_status:  row.pump_status as boolean | undefined,
+    created_at:   row.created_at as string,
+  };
+}
+
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const latestOnly = searchParams.get("latest") === "1";
@@ -56,24 +73,24 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ columns: cols });
     }
 
-    // ── Single latest row for polling fallback ────────────────────────────────
+    // ── Single latest row for polling fallback ─────────────────────────────
     if (latestOnly) {
-      const rows = (await sql`
+      const raw = (await sql`
         SELECT *
         FROM   sensor_logs
         ORDER  BY created_at DESC
         LIMIT  1
-      `) as unknown as SensorLogRow[];
+      `) as unknown as Record<string, unknown>[];
 
-      if (rows.length === 0) {
+      if (raw.length === 0) {
         return NextResponse.json({ row: null });
       }
 
-      return NextResponse.json({ row: rows[0] });
+      return NextResponse.json({ row: parseRow(raw[0]) });
     }
 
     // ── Multiple rows for initial chart history (ascending chronological) ──────
-    const rows = (await sql`
+    const raw = (await sql`
       SELECT *
       FROM   (
         SELECT * FROM sensor_logs
@@ -81,9 +98,9 @@ export async function GET(request: NextRequest) {
         LIMIT  ${limit}
       ) sub
       ORDER  BY created_at ASC
-    `) as unknown as SensorLogRow[];
+    `) as unknown as Record<string, unknown>[];
 
-    return NextResponse.json({ rows });
+    return NextResponse.json({ rows: raw.map(parseRow) });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     console.error("[api/sensor-logs] GET error:", message);
