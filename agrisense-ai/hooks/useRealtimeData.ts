@@ -7,8 +7,8 @@ import type { ChartPoint, AlertData, LogEntry } from "@/lib/mockData";
 import type { SensorLogRow } from "@/app/api/sensor-logs/route";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-// NOTE: Neon table has 5 columns: id, temperature, humidity, soil_moisture, created_at
-// Fields not in DB (pump_status, soil_raw_adc) are derived or defaulted below.
+// Neon table columns: id, temperature, humidity, soil_moisture, created_at
+// Optional columns that may also be present: pump_status, soil_raw_adc, mqtt_topic
 
 function deriveDisease(moisture: number): string {
   if (moisture < 30) return "Moisture Stress";
@@ -16,26 +16,31 @@ function deriveDisease(moisture: number): string {
 }
 
 function rowToSensorData(row: SensorLogRow): MqttSensorData {
+  // pump_status comes from the DB as a boolean (or null if column absent).
+  // Use it directly; fall back to false if the column doesn't exist yet.
+  const pumpOn = row.pump_status === true;
+
   return {
     soilMoisture: row.soil_moisture,
     temperature:  row.temperature,
     humidity:     row.humidity,
     aiConfidence: 90 + Math.round(Math.random() * 8),
     disease:      deriveDisease(row.soil_moisture),
-    waterFlow:    0,   // not available in current schema
+    waterFlow:    pumpOn ? parseFloat((1.5 + Math.random() * 3).toFixed(1)) : 0,
     tankCapacity: 70,
     phLevel:      parseFloat((6.2 + Math.random() * 0.8).toFixed(1)),
-    pumpActive:   false, // not available in current schema
+    pumpActive:   pumpOn,   // ← now reads real DB value
     timestamp:    row.created_at ? new Date(row.created_at).getTime() : Date.now(),
   };
 }
 
 function rowToChartPoint(row: SensorLogRow): ChartPoint {
   const t = row.created_at ? new Date(row.created_at) : new Date();
+  const pumpOn = row.pump_status === true;
   return {
     time:        `${t.getHours().toString().padStart(2, "0")}:${t.getMinutes().toString().padStart(2, "0")}`,
     moisture:    row.soil_moisture,
-    pump:        0,   // not available in current schema
+    pump:        pumpOn ? 80 : 0,   // visualise pump activity on charts
     confidence:  90 + Math.round(Math.random() * 8),
     temperature: row.temperature,
     healthScore: row.soil_moisture > 50 ? 90 : row.soil_moisture > 30 ? 65 : 40,
@@ -43,15 +48,16 @@ function rowToChartPoint(row: SensorLogRow): ChartPoint {
 }
 
 function rowToLogEntry(row: SensorLogRow): LogEntry {
+  const pumpOn = row.pump_status === true;
   return {
     id:       `${row.id}-${Date.now()}`,
     time:     row.created_at
       ? new Date(row.created_at).toLocaleTimeString("en-US", { hour12: false })
       : new Date().toLocaleTimeString("en-US", { hour12: false }),
     sensor:   "ESP8266",
-    event:    "Sensor reading received",
+    event:    pumpOn ? "Pump ON — Auto irrigation" : "Sensor reading received",
     status:   row.soil_moisture < 30 ? "warning" : "info",
-    aiResult: `Soil ${row.soil_moisture}% | T:${row.temperature}°C | H:${row.humidity}%`,
+    aiResult: `Soil ${row.soil_moisture}% | T:${row.temperature}°C | H:${row.humidity}% | Pump:${pumpOn ? "ON" : "OFF"}`,
   };
 }
 

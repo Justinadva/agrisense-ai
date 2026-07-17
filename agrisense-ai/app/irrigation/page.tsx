@@ -69,7 +69,14 @@ function PumpToggle({ active, onToggle }: { active: boolean; onToggle: () => voi
 
 export default function IrrigationPage() {
   useRealtimeData();
-  const { sensorData, pumpActive, pumpAutoMode, moistureThreshold, togglePump, toggleAutoMode, setMoistureThreshold } = useAgriStore();
+  const {
+    sensorData, pumpActive, pumpAutoMode, moistureThreshold,
+    togglePump, toggleAutoMode, setMoistureThreshold,
+  } = useAgriStore();
+
+  // pumpActive in store is synced from sensorData.pumpActive
+  // which is derived from DB pump_status — use sensorData as the single source of truth
+  const isPumpOn = sensorData.pumpActive;
 
   const aiInsights = [
     {
@@ -124,7 +131,7 @@ export default function IrrigationPage() {
           <div className="flex flex-col items-center py-6 gap-4">
             <motion.div
               animate={{
-                boxShadow: pumpActive
+                boxShadow: isPumpOn
                   ? ["0 0 0 0 rgba(47,158,68,0.4)", "0 0 0 24px rgba(47,158,68,0)", "0 0 0 0 rgba(47,158,68,0.4)"]
                   : "0 0 0 0 rgba(47,158,68,0)",
               }}
@@ -132,14 +139,14 @@ export default function IrrigationPage() {
               className="w-28 h-28 rounded-full flex items-center justify-center relative cursor-pointer"
               onClick={togglePump}
               style={{
-                background: pumpActive
+                background: isPumpOn
                   ? "linear-gradient(135deg,#2f9e44,#1f6f3d)"
                   : "rgba(255,255,255,0.08)",
-                border: `3px solid ${pumpActive ? "#22c55e" : "rgba(255,255,255,0.15)"}`,
+                border: `3px solid ${isPumpOn ? "#22c55e" : "rgba(255,255,255,0.15)"}`,
               }}
             >
-              <Power className="w-10 h-10" style={{ color: pumpActive ? "#fff" : "#4a6856" }} />
-              {pumpActive && (
+              <Power className="w-10 h-10" style={{ color: isPumpOn ? "#fff" : "#4a6856" }} />
+              {isPumpOn && (
                 <motion.div
                   className="absolute inset-0 rounded-full border-2 border-green-400"
                   animate={{ scale: [1, 1.3, 1.3], opacity: [0.6, 0, 0] }}
@@ -148,12 +155,19 @@ export default function IrrigationPage() {
               )}
             </motion.div>
             <div className="text-center">
-              <p className="font-bold text-lg" style={{ color: pumpActive ? "#4ade80" : "#4a6856" }}>
-                {pumpActive ? "PUMP ACTIVE" : "PUMP OFFLINE"}
+              <p className="font-bold text-lg" style={{ color: isPumpOn ? "#4ade80" : "#4a6856" }}>
+                {isPumpOn ? "PUMP ONLINE" : "PUMP OFFLINE"}
               </p>
-              <p className="text-xs mt-0.5 text-green-600">
-                {pumpActive ? "Water flowing at optimal rate" : "Click to activate pump"}
+              <p className="text-xs mt-0.5" style={{ color: isPumpOn ? "#86efac" : "#4a6856" }}>
+                {isPumpOn ? "Water flowing at optimal rate" : "Click to activate pump"}
               </p>
+              {/* DB sync badge */}
+              <div className="flex items-center justify-center gap-1.5 mt-2">
+                <span className="w-1.5 h-1.5 rounded-full" style={{ background: isPumpOn ? "#22c55e" : "#4a6856" }} />
+                <span className="text-[10px]" style={{ color: "#4a6856" }}>
+                  Synced from database
+                </span>
+              </div>
             </div>
           </div>
 
@@ -165,7 +179,7 @@ export default function IrrigationPage() {
                 <p className="text-sm font-semibold text-white">Main Pump</p>
                 <p className="text-xs text-green-600">Manual control</p>
               </div>
-              <PumpToggle active={pumpActive} onToggle={togglePump} />
+              <PumpToggle active={isPumpOn} onToggle={togglePump} />
             </div>
 
             <div className="flex items-center justify-between py-3 px-4 rounded-[16px]"
