@@ -51,10 +51,10 @@ export default function HeroOverviewCard() {
         <div>
           <div className="flex items-center gap-2 mb-2">
             <span className="pulse-dot" />
-            <span className="text-green-200 text-xs font-medium">Live Monitoring</span>
+            <span className="text-green-200 text-xs font-medium">Serial Monitoring</span>
           </div>
           <h2 className="text-4xl font-bold text-white leading-tight">Overview</h2>
-          <p className="text-green-200 text-sm mt-1">Tomato Farm — 6 Active Containers</p>
+          <p className="text-green-200 text-sm mt-1">Arduino Uno — via USB Serial Gateway</p>
         </div>
 
         {/* Plant illustration */}

@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     type: "website",
     siteName: "AgriSense AI",
     title: "AgriSense AI — Smart Farming Dashboard",
-    description: "Realtime IoT smart farming dashboard powered by MQTT and AI",
+    description: "Realtime IoT smart farming dashboard powered by Arduino Serial, Neon PostgreSQL, and AI",
   },
 };
 

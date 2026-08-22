@@ -60,7 +60,7 @@ const notifIcons: Record<string, React.ReactNode> = {
   info: <Info className="w-4 h-4 text-blue-400" />,
 };
 
-// ─── MQTT Status badge config ────────────────────────────────────────────────
+// ─── Connection Status badge config (Arduino Serial → serial-to-neon gateway) ─
 interface StatusCfg {
   bg: string;
   color: string;
@@ -70,11 +70,11 @@ interface StatusCfg {
 }
 
 const mqttStatusConfig: Record<MqttStatus, StatusCfg> = {
-  connected:    { bg: "rgba(34,197,94,0.1)",    color: "#22c55e", label: "MQTT Live",     pulse: true,  icon: Wifi      },
-  connecting:   { bg: "rgba(244,197,66,0.12)",  color: "#f4c542", label: "Connecting…",  pulse: true,  icon: Radio     },
-  fallback:     { bg: "rgba(56,189,248,0.1)",   color: "#38bdf8", label: "Simulated",    pulse: true,  icon: Activity  },
-  error:        { bg: "rgba(239,68,68,0.1)",    color: "#ef4444", label: "Error",        pulse: false, icon: WifiOff   },
-  disconnected: { bg: "rgba(107,124,114,0.1)",  color: "#6b7c72", label: "Offline",      pulse: false, icon: WifiOff   },
+  connected:    { bg: "rgba(34,197,94,0.1)",    color: "#22c55e", label: "Serial Gateway",  pulse: true,  icon: Wifi      },
+  connecting:   { bg: "rgba(244,197,66,0.12)",  color: "#f4c542", label: "Connecting…",     pulse: true,  icon: Radio     },
+  fallback:     { bg: "rgba(56,189,248,0.1)",   color: "#38bdf8", label: "Simulated",       pulse: true,  icon: Activity  },
+  error:        { bg: "rgba(239,68,68,0.1)",    color: "#ef4444", label: "Gateway Error",   pulse: false, icon: WifiOff   },
+  disconnected: { bg: "rgba(107,124,114,0.1)",  color: "#6b7c72", label: "Offline",         pulse: false, icon: WifiOff   },
 };
 
 export default function Navbar() {
@@ -152,7 +152,7 @@ export default function Navbar() {
 
           {/* Right Controls */}
           <div className="flex items-center gap-2">
-            {/* ── MQTT Connection Status (live from Zustand) ── */}
+            {/* ── Gateway Connection Status (Arduino Serial → Neon DB) ── */}
             <div
               className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-medium transition-all duration-500"
               style={{ background: statusCfg.bg, color: statusCfg.color }}

@@ -49,13 +49,13 @@ export default function RealtimePage() {
         <div>
           <h1 className="text-2xl font-bold" style={{ color: "#1e2b22" }}>Realtime Monitoring</h1>
           <p className="text-sm mt-0.5" style={{ color: "#6b7c72" }}>
-            Live sensor data — updates every 3 seconds
+            Live sensor data via Arduino Serial — polling every 10 seconds
           </p>
         </div>
         <div className="flex items-center gap-2 px-3.5 py-2 rounded-[14px]"
           style={{ background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.2)" }}>
           <Wifi className="w-4 h-4" style={{ color: "#22c55e" }} />
-          <span className="text-sm font-semibold" style={{ color: "#16a34a" }}>Connected — MQTT Live</span>
+          <span className="text-sm font-semibold" style={{ color: "#16a34a" }}>Gateway Connected — Neon DB</span>
           <span className="pulse-dot" />
         </div>
       </div>

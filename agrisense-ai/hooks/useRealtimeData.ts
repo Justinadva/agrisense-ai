@@ -54,7 +54,7 @@ function rowToLogEntry(row: SensorLogRow): LogEntry {
     time:     row.created_at
       ? new Date(row.created_at).toLocaleTimeString("en-US", { hour12: false })
       : new Date().toLocaleTimeString("en-US", { hour12: false }),
-    sensor:   "ESP8266",
+    sensor:   "Arduino Uno",
     event:    pumpOn ? "Pump ON — Auto irrigation" : "Sensor reading received",
     status:   row.soil_moisture < 30 ? "warning" : "info",
     aiResult: `Soil ${row.soil_moisture}% | T:${row.temperature}°C | H:${row.humidity}% | Pump:${pumpOn ? "ON" : "OFF"}`,
