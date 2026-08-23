@@ -8,11 +8,14 @@
     "start": "next start",
     "lint": "eslint",
     "bridge": "ts-node --project tsconfig.scripts.json scripts/mqtt-to-supabase.ts",
-    "bridge:dev": "ts-node --project tsconfig.scripts.json --watch scripts/mqtt-to-supabase.ts"
+    "bridge:dev": "ts-node --project tsconfig.scripts.json --watch scripts/mqtt-to-supabase.ts",
+    "serial": "ts-node --project tsconfig.scripts.json scripts/serial-to-neon.ts",
+    "serial:dev": "ts-node --project tsconfig.scripts.json --watch scripts/serial-to-neon.ts"
   },
   "dependencies": {
     "@ducanh2912/next-pwa": "^10.2.9",
     "@neondatabase/serverless": "^1.1.0",
+    "@serialport/parser-readline": "^13.0.0",
     "date-fns": "^4.3.0",
     "framer-motion": "^12.40.0",
     "lucide-react": "^1.16.0",
@@ -21,6 +24,7 @@
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "recharts": "^3.8.1",
+    "serialport": "^13.0.0",
     "socket.io-client": "^4.8.3",
     "ts-node": "^10.9.2",
     "zustand": "^5.0.13"
